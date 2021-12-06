@@ -1,4 +1,4 @@
-module github.com/mbanikazemi/grpc-http1
+module github.com/mbanikazemi/go-grpc-http1
 
 go 1.14
 
