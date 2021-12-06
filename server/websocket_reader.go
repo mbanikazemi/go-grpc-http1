@@ -20,7 +20,7 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"golang.stackrox.io/grpc-http1/internal/grpcproto"
+	"github.com/mbanikazemi/go-grpc-http1/internal/grpcproto"
 	"nhooyr.io/websocket"
 )
 
