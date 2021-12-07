@@ -47,9 +47,11 @@ func newWebSocketResponseWriter() (*wsResponseWriter, io.ReadCloser) {
 }
 
 func (w *wsResponseWriter) Write(p []byte) (int, error) {
+	glog.Infof("gRPC server write, request: %v", p)
 	if !w.headerWritten {
 		w.WriteHeader(http.StatusOK)
 	}
+	glog.Infof("gRPC server write, request: %v", w.headerWritten)
 	return w.writer.Write(p)
 }
 
