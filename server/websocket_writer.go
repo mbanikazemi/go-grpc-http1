@@ -61,7 +61,9 @@ func (w *wsResponseWriter) WriteHeader(statusCode int) {
 	if w.headerWritten {
 		return
 	}
+	
 
+	glog.Infof("gRPC server sending request with header: %v", w.header)
 	if statusCode != http.StatusOK && statusCode != http.StatusUnsupportedMediaType {
 		glog.Errorf("gRPC server sending unexpected status code: %d", statusCode)
 	}
