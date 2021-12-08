@@ -46,6 +46,7 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 			glog.V(2).Infof("Malformed gRPC message when reading header sent from %s: %v", sender, err)
 			return err
 		}
+		glog.Infof("Read header")
 
 		_, length, err := grpcproto.ParseMessageHeader(msg.Bytes())
 		if err != nil {
@@ -63,6 +64,7 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 			}
 			return err
 		}
+		glog.Infof("Read message")
 
 		// Write the entire message frame along the WebSocket connection.
 		if err := conn.Write(ctx, websocket.MessageBinary, msg.Bytes()); err != nil {
