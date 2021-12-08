@@ -68,7 +68,7 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 
 		// Write the entire message frame along the WebSocket connection.
 		if err := conn.Write(ctx, websocket.MessageBinary, msg.Bytes()); err != nil {
-			glog.V(2).Infof("Unable to write gRPC message from %s: %v", sender, err)
+			glog.Infof("Unable to write gRPC message from %s: %v", sender, err)
 			return err
 		}
 		glog.Infof("Finished one iteration of Write")
