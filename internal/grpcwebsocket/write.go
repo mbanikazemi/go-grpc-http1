@@ -37,6 +37,7 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 		// Read message header into the msg buffer.
 		if _, err := ioutils.CopyNFull(&msg, r, grpcproto.MessageHeaderLength); err != nil {
 			if err == io.EOF {
+				glog.Infof("EOF")
 				// EOF here means the sender has no more messages to send.
 				return nil
 			}
@@ -47,6 +48,7 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 
 		_, length, err := grpcproto.ParseMessageHeader(msg.Bytes())
 		if err != nil {
+			glog.Infof("Header parsing error")
 			return err
 		}
 
@@ -66,5 +68,6 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 			glog.V(2).Infof("Unable to write gRPC message from %s: %v", sender, err)
 			return err
 		}
+		glog.Infof("Finished one iteration of Write")
 	}
 }
