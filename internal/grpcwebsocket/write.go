@@ -64,7 +64,7 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 			}
 			return err
 		}
-		glog.Infof("Read message")
+		glog.Infof("Read message; message size: %v", len(msg.Bytes()))
 
 		// Write the entire message frame along the WebSocket connection.
 		if err := conn.Write(ctx, websocket.MessageBinary, msg.Bytes()); err != nil {
