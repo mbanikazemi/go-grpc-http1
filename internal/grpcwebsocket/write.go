@@ -32,6 +32,7 @@ import (
 func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string) error {
 	var msg bytes.Buffer
 	for {
+		glog.Infof("Started one iteration of Write")
 		// Reset the message buffer to start with a clean slate.
 		msg.Reset()
 		// Read message header into the msg buffer.
