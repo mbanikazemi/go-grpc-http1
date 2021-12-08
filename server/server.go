@@ -57,6 +57,7 @@ func handleGRPCWS(w http.ResponseWriter, req *http.Request, grpcSrv *grpc.Server
 
 	// Filter out all WebSocket-specific headers.
 	hdr := grpcReq.Header
+	glog.Infof("Received headers: %v\n", hdr)
 	hdr.Del("Connection")
 	hdr.Del("Upgrade")
 	for k := range hdr {
@@ -66,6 +67,7 @@ func handleGRPCWS(w http.ResponseWriter, req *http.Request, grpcSrv *grpc.Server
 	}
 	// Remove content-length header info.
 	hdr.Del("Content-Length")
+	glog.Infof("Cleaned up headers: %v\n", hdr)
 	grpcReq.ContentLength = -1
 
 	// Set the body to a custom WebSocket reader.
