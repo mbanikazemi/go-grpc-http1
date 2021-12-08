@@ -71,13 +71,15 @@ func (w *wsResponseWriter) WriteHeader(statusCode int) {
 	}
 
 	hdr := w.header
+	glog.Infof("headers to send back: %v", hdr)
 	w.announcedTrailers = sliceutils.StringClone(hdr["Trailer"])
 	// Trailers will be sent un-announced in non-Trailers-only responses.
 	hdr.Del("Trailer")
 
 	// Any content length that might be set is no longer accurate because of trailers.
 	hdr.Del("Content-Length")
-
+	glog.Infof("headers to send back after clean up: %v", hdr)
+	
 	// Write the response header.
 	var buf bytes.Buffer
 	_ = hdr.Write(&buf)
