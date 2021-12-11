@@ -67,9 +67,9 @@ func handleGRPCWS(w http.ResponseWriter, req *http.Request, grpcSrv *grpc.Server
 	}
 	// Remove content-length header info.
 	hdr.Del("Content-Length")
-	hdr.Add("Content-Type", "application/grpc")
-	hdr.Add("Te", "trailers")
-	hdr.Add("Accept-Encoding", "gzip")
+	// hdr.Add("Content-Type", "application/grpc")
+	// hdr.Add("Te", "trailers")
+	// hdr.Add("Accept-Encoding", "gzip")
 	glog.Infof("Cleaned up headers: %v\n", hdr)
 	grpcReq.ContentLength = -1
 
