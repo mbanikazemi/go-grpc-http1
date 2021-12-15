@@ -44,11 +44,14 @@ func modifyResponse(resp *http.Response) error {
 	if err := httputils.ExtractResponseError(resp); err != nil {
 		return errors.Wrap(err, "receiving gRPC response from remote endpoint")
 	}
-
+	fmt.Printf("response len: %v", resp.ContentLength)
+	
 	if resp.ContentLength == 0 {
 		// Make sure headers do not get flushed, as otherwise the gRPC client will complain about missing trailers.
 		resp.Header.Set(dontFlushHeadersHeaderKey, "true")
 	}
+	
+	fmt.Printf("response header: %v", resp.Header)
 	contentType, contentSubType := stringutils.Split2(resp.Header.Get("Content-Type"), "+")
 	if contentType != "application/grpc-web" {
 		// No modification necessary if we aren't handling a gRPC web response.
@@ -56,10 +59,14 @@ func modifyResponse(resp *http.Response) error {
 	}
 
 	respCT := "application/grpc"
+	fmt.Printf("response header being set: %v", respCT)
+	
 	if contentSubType != "" {
 		respCT += "+" + contentSubType
 	}
 	resp.Header.Set("Content-Type", respCT)
+	fmt.Printf("response header after being set: %v", resp.Header)
+
 
 	if resp.Body != nil {
 		resp.Body = grpcweb.NewResponseReader(resp.Body, &resp.Trailer, nil)
