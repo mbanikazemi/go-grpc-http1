@@ -84,18 +84,25 @@ func handleGRPCWS(w http.ResponseWriter, req *http.Request, grpcSrv *grpc.Server
 	go func() {
 		defer wg.Done()
 		if err := grpcwebsocket.Write(ctx, conn, respReader, name); err != nil {
+			glog.Infof("Web socket write errored with: %v\n", err)
 			_ = conn.Close(websocket.StatusInternalError, err.Error())
 		}
 	}()
 
 	grpcSrv.ServeHTTP(grpcResponseWriter, grpcReq)
+	glog.Info("Web socket write serving http\n")
+	
 	if err := grpcResponseWriter.Close(); err != nil {
+		glog.Infof("Web socket grpcresponsewriter errored with: %v\n", err)
 		_ = conn.Close(websocket.StatusInternalError, err.Error())
 	}
 
+	glog.Info("Web socket write waiting\n")
 	wg.Wait()
 	// It's ok to potentially close the connection multiple times.
 	// Only the first time matters.
+	
+	glog.Info("Web socket write closing \n")
 	_ = conn.Close(websocket.StatusNormalClosure, "")
 }
 
