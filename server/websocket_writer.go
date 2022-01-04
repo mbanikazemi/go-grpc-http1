@@ -47,11 +47,9 @@ func newWebSocketResponseWriter() (*wsResponseWriter, io.ReadCloser) {
 }
 
 func (w *wsResponseWriter) Write(p []byte) (int, error) {
-	glog.Infof("gRPC server write, request: %v", p)
 	if !w.headerWritten {
 		w.WriteHeader(http.StatusOK)
 	}
-	glog.Infof("gRPC server write, request: %v", w.headerWritten)
 	return w.writer.Write(p)
 }
 
@@ -63,23 +61,19 @@ func (w *wsResponseWriter) WriteHeader(statusCode int) {
 	if w.headerWritten {
 		return
 	}
-	
 
-	glog.Infof("gRPC server sending request with header: %v", w.header)
 	if statusCode != http.StatusOK && statusCode != http.StatusUnsupportedMediaType {
 		glog.Errorf("gRPC server sending unexpected status code: %d", statusCode)
 	}
 
 	hdr := w.header
-	glog.Infof("headers to send back: %v", hdr)
 	w.announcedTrailers = sliceutils.StringClone(hdr["Trailer"])
 	// Trailers will be sent un-announced in non-Trailers-only responses.
 	hdr.Del("Trailer")
 
 	// Any content length that might be set is no longer accurate because of trailers.
 	hdr.Del("Content-Length")
-	glog.Infof("headers to send back after clean up: %v", hdr)
-	
+
 	// Write the response header.
 	var buf bytes.Buffer
 	_ = hdr.Write(&buf)

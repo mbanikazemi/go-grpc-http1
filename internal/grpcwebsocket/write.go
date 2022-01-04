@@ -32,13 +32,11 @@ import (
 func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string) error {
 	var msg bytes.Buffer
 	for {
-		glog.Infof("Started one iteration of Write")
 		// Reset the message buffer to start with a clean slate.
 		msg.Reset()
 		// Read message header into the msg buffer.
 		if _, err := ioutils.CopyNFull(&msg, r, grpcproto.MessageHeaderLength); err != nil {
 			if err == io.EOF {
-				glog.Infof("EOF")
 				// EOF here means the sender has no more messages to send.
 				return nil
 			}
@@ -46,11 +44,9 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 			glog.V(2).Infof("Malformed gRPC message when reading header sent from %s: %v", sender, err)
 			return err
 		}
-		glog.Infof("Read header")
 
 		_, length, err := grpcproto.ParseMessageHeader(msg.Bytes())
 		if err != nil {
-			glog.Infof("Header parsing error")
 			return err
 		}
 
@@ -64,13 +60,11 @@ func Write(ctx context.Context, conn *websocket.Conn, r io.Reader, sender string
 			}
 			return err
 		}
-		glog.Infof("Read message; message size: %v", len(msg.Bytes()))
 
 		// Write the entire message frame along the WebSocket connection.
 		if err := conn.Write(ctx, websocket.MessageBinary, msg.Bytes()); err != nil {
-			glog.Infof("Unable to write gRPC message from %s: %v", sender, err)
+			glog.V(2).Infof("Unable to write gRPC message from %s: %v", sender, err)
 			return err
 		}
-		glog.Infof("Finished one iteration of Write")
 	}
 }

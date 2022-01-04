@@ -23,14 +23,14 @@ import (
 	"net/http/httputil"
 
 	"github.com/golang/glog"
-	"github.com/pkg/errors"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 	"github.com/mbanikazemi/go-grpc-http1/internal/grpcproto"
 	"github.com/mbanikazemi/go-grpc-http1/internal/grpcweb"
 	"github.com/mbanikazemi/go-grpc-http1/internal/httputils"
-	"github.com/mbanikazemi/go-rpc-http1/internal/pipeconn"
 	"github.com/mbanikazemi/go-grpc-http1/internal/stringutils"
+	"github.com/mbanikazemi/go-rpc-http1/internal/pipeconn"
+	"github.com/pkg/errors"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
@@ -49,7 +49,6 @@ func modifyResponse(resp *http.Response) error {
 		// Make sure headers do not get flushed, as otherwise the gRPC client will complain about missing trailers.
 		resp.Header.Set(dontFlushHeadersHeaderKey, "true")
 	}
-
 	contentType, contentSubType := stringutils.Split2(resp.Header.Get("Content-Type"), "+")
 	if contentType != "application/grpc-web" {
 		// No modification necessary if we aren't handling a gRPC web response.
@@ -57,7 +56,6 @@ func modifyResponse(resp *http.Response) error {
 	}
 
 	respCT := "application/grpc"
-
 	if contentSubType != "" {
 		respCT += "+" + contentSubType
 	}

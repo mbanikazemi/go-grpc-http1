@@ -57,7 +57,6 @@ func handleGRPCWS(w http.ResponseWriter, req *http.Request, grpcSrv *grpc.Server
 
 	// Filter out all WebSocket-specific headers.
 	hdr := grpcReq.Header
-	glog.Infof("Received headers: %v\n", hdr)
 	hdr.Del("Connection")
 	hdr.Del("Upgrade")
 	for k := range hdr {
@@ -67,10 +66,10 @@ func handleGRPCWS(w http.ResponseWriter, req *http.Request, grpcSrv *grpc.Server
 	}
 	// Remove content-length header info.
 	hdr.Del("Content-Length")
+	// TODO(mb): revisit
 	hdr.Add("Content-Type", "application/grpc")
 	// hdr.Add("Te", "trailers")
 	// hdr.Add("Accept-Encoding", "gzip")
-	glog.Infof("Cleaned up headers: %v\n", hdr)
 	grpcReq.ContentLength = -1
 
 	// Set the body to a custom WebSocket reader.
@@ -84,25 +83,18 @@ func handleGRPCWS(w http.ResponseWriter, req *http.Request, grpcSrv *grpc.Server
 	go func() {
 		defer wg.Done()
 		if err := grpcwebsocket.Write(ctx, conn, respReader, name); err != nil {
-			glog.Infof("Web socket write errored with: %v\n", err)
 			_ = conn.Close(websocket.StatusInternalError, err.Error())
 		}
 	}()
 
 	grpcSrv.ServeHTTP(grpcResponseWriter, grpcReq)
-	glog.Info("Web socket write serving http\n")
-	
 	if err := grpcResponseWriter.Close(); err != nil {
-		glog.Infof("Web socket grpcresponsewriter errored with: %v\n", err)
 		_ = conn.Close(websocket.StatusInternalError, err.Error())
 	}
 
-	glog.Info("Web socket write waiting\n")
 	wg.Wait()
 	// It's ok to potentially close the connection multiple times.
 	// Only the first time matters.
-	
-	glog.Info("Web socket write closing \n")
 	_ = conn.Close(websocket.StatusNormalClosure, "")
 }
 
@@ -208,17 +200,17 @@ func isWebSocketUpgrade(header http.Header) (bool, error) {
 	if header.Get("Sec-Websocket-Protocol") != grpcwebsocket.SubprotocolName {
 		return false, nil
 	}
-	
+
 	connectionValue := header.Get("Connection")
 	if (connectionValue != "upgrade") && (connectionValue != "Upgrade") {
 		return false, errors.New("missing 'Connection: Upgrade' header in gRPC-websocket request (this usually means your proxy or load balancer does not support websockets)")
 	}
-	
+
 	upgradeValue := header.Get("Upgrade")
 	if (upgradeValue != "websocket") && (upgradeValue != "Websocket") {
 		return false, errors.New("missing 'Upgrade: websocket' header in gRPC-websocket request (this usually means your proxy or load balancer does not support websockets)")
 	}
-	
+
 	return true, nil
 }
 
